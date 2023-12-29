@@ -46,7 +46,7 @@ if (-not $ipAddr) {
 $count = [regex]::matches($hostname, '[\.]').count
 Write-Debug "Found $count periods (.) within hostname '$hostname' provided." -Debug
 
-# Bases whether a TLD is provided using the number of periods included in the value provided.
+# Determines whether a TLD has been provided using the number of periods included in the hostname.
 if ($count -eq 1) {
     $dnsName = "@"
     $zoneName = $hostname
