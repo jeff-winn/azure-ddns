@@ -3,10 +3,6 @@ using namespace System.Net
 # Input bindings are passed in via param block.
 param($Request, $TriggerMetadata)
 
-if ($env:IsDebugEnabled -eq "true") {
-    Wait-Debugger
-}
-
 $dnsZoneRGName = $env:DnsZoneRGName
 if (-not $dnsZoneRGName) {
     Write-Error "The DNS Zone Resource Group name has not been specified. Please ensure the DnsZoneRGName environment variable has been set."
