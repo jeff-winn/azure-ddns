@@ -21,7 +21,7 @@ custom your-ddns.azurewebsites.net:1 {
 }
 ```
 
-__Configuration Settings__
+### Configuration Settings
 The following describes the aforementioned configuration section settings:
 
 - _hostname_: This __MUST__ be the DNS entry being updated.
