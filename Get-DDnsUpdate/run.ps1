@@ -3,12 +3,16 @@ using namespace System.Net
 # Input bindings are passed in via param block.
 param($Request, $TriggerMetadata)
 
+if ($env:IsDebugEnabled) {
+    Wait-Debugger
+}
+
 $dnsZoneRGName = $env:DnsZoneRGName
 if (-not $dnsZoneRGName) {
-    Write-Error "The DNS Zone Resource Group name has not been specified. Please ensure the DnsZoneRGName environment variable has been set."
+    Write-Error "The DNS Zone Resource Group name has not been specified. Please ensure the DnsZoneRGName application setting has been configured."
 
     Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
-        StatusCode = [HttpStatusCode]::BadRequest
+        StatusCode = [HttpStatusCode]::InternalServerError
     })
 
     exit
@@ -27,7 +31,7 @@ if (-not $hostname) {
 
 $ipAddr = $Request.Query.IPAddr
 if (-not $ipAddr) {
-    Write-Error "The new IPAddr was not provided in the request."
+    Write-Error "The IPAddr was not provided in the request."
 
     Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
         StatusCode = [HttpStatusCode]::BadRequest
@@ -36,9 +40,17 @@ if (-not $ipAddr) {
     exit
 }
 
-# TODO: This likely needs to support more than a single subdomain. For example: mydomain.com instead of only my.domain.com
-$dnsName = $hostname.Substring(0, $hostname.IndexOf('.'))
-$zoneName = $hostname.Substring($hostname.IndexOf('.') + 1)
+$count = [regex]::matches($hostname, '[\.]').count
+Write-Debug "Found $count periods (.) within '$hostname' provided." -Debug
+
+# Bases whether a TLD is provided using the number of periods included in the value provided.
+if ($count -eq 1) {
+    $dnsName = "@"
+    $zoneName = $hostname
+} else {
+    $dnsName = $hostname.Substring(0, $hostname.IndexOf('.'))
+    $zoneName = $hostname.Substring($hostname.IndexOf('.') + 1)
+}
 
 Write-Debug "Hostname: $hostname" -Debug
 Write-Debug "Record: $dnsName" -Debug
@@ -47,7 +59,16 @@ Write-Debug "New IP Address: $ipAddr" -Debug
 
 $rs = Get-AzDnsRecordSet -ResourceGroupName $dnsZoneRGName -ZoneName $zoneName -Name $dnsName -RecordType A
 if (-not $rs) {
-    Write-Error "Could not locate the DNS record $dnsName in zone $zoneName. Please check your Azure configuration and try again."
+    Write-Error "Could not locate the DNS record '$dnsName' in zone '$zoneName'. Please check your Azure DNS configuration and try again."
+
+    Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
+        StatusCode = [HttpStatusCode]::NotFound
+    })
+
+    exit
+} elseif ($rs.TargetResourceId) {
+    # The recordset being used is an alias to another recordset, rather than the owner. Abort.
+    Write-Error "Could not update the DNS record '$dnsName' in zone '$zoneName' because it is an alias. Please check your Azure DNS configuration and try again."
 
     Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
         StatusCode = [HttpStatusCode]::BadRequest
@@ -56,7 +77,7 @@ if (-not $rs) {
     exit
 }
 
-Write-Debug "Checking the existing records for zone $zoneName..." -Debug
+Write-Debug "Checking the existing records for zone '$zoneName'..." -Debug
 
 $found = $false
 $ipAddrsToRemove = @()
@@ -81,7 +102,7 @@ foreach ($existingIpAddr in $ipAddrsToRemove) {
 
 if (!$found) {
     Add-AzDnsRecordConfig -RecordSet $rs -Ipv4Address $ipAddr
-    Write-Information "Added new IPv4 Address '$ipAddr' to DNZ zone '$zoneName'."
+    Write-Information "Added new IPv4 Address '$ipAddr' to DNS zone '$zoneName'."
 }
 
 Set-AzDnsRecordSet -RecordSet $rs
