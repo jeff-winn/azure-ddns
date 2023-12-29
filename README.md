@@ -17,7 +17,7 @@ custom your-ddns.azurewebsites.net:1 {
     username    = "code"
     password    = "<<REDACTED>>"
     ddns-server = "your-ddns.azurewebsites.net"
-    ddns-path   = "/api/ddns/update?%u=%p&hostname=%h&ipaddr=%i"
+    ddns-path   = "/api/azure-ddns/update?%u=%p&hostname=%h&ipaddr=%i"
 }
 ```
 
@@ -38,7 +38,7 @@ inadyn -1n --force --loglevel=DEBUG --config=/etc/inadyn.conf
 
 The following snippet depicts what you should see on the Inadyn client when communicating with your DDNS service.
 ```
-GET /api/ddns/update?code=<<YOUR_API_KEY>>&hostname=<<YOUR DOMAIN>>&ipaddr=<<YOUR_IP>> HTTP/1.0
+GET /api/azure-ddns/update?code=<<YOUR_API_KEY>>&hostname=<<YOUR DOMAIN>>&ipaddr=<<YOUR_IP>> HTTP/1.0
 Host: <<AZURE_FUNCTION_URL>>
 Authorization: Basic <<REDACTED>>
 User-Agent: inadyn/2.9.1 https://github.com/troglobit/inadyn/issues

@@ -8,7 +8,7 @@
         "methods": [
           "get"
         ],
-        "route": "ddns/update"
+        "route": "azure-ddns/update"
       },
       {
         "type": "http",
