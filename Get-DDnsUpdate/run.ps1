@@ -40,10 +40,10 @@ if (-not $ipAddr) {
 $dnsName = $hostname.Substring(0, $hostname.IndexOf('.'))
 $zoneName = $hostname.Substring($hostname.IndexOf('.') + 1)
 
-Write-Debug "Hostname: $hostname"
-Write-Debug "Record: $dnsName"
-Write-Debug "DNS Zone: $zoneName"
-Write-Debug "New IP Address: $ipAddr"
+Write-Debug "Hostname: $hostname" -Debug
+Write-Debug "Record: $dnsName" -Debug
+Write-Debug "DNS Zone: $zoneName" -Debug
+Write-Debug "New IP Address: $ipAddr" -Debug
 
 $rs = Get-AzDnsRecordSet -ResourceGroupName $dnsZoneRGName -ZoneName $zoneName -Name $dnsName -RecordType A
 if (-not $rs) {
@@ -56,7 +56,7 @@ if (-not $rs) {
     exit
 }
 
-Write-Debug "Checking the existing records for zone $zoneName..."
+Write-Debug "Checking the existing records for zone $zoneName..." -Debug
 
 $found = $false
 $ipAddrsToRemove = @()
@@ -67,7 +67,7 @@ foreach ($record in $rs.Records) {
         $ipAddrsToRemove += $record.Ipv4Address
     } else {
         # The address already exists, do not try to add it later.
-        Write-Debug "Address already exists within the record set..."
+        Write-Debug "Address already exists within the record set..." -Debug
         $found = $true
     }
 }
