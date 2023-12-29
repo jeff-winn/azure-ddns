@@ -1,6 +1,8 @@
 # Azure DDNS
 Provides an Inadyn compatible DDNS provider hosted by an Azure Function which uses an underlying Microsoft Azure DNS Zone to maintain the IP address for a single A record.
 
+Keep in mind, this provider is meant to be Inadyn compatible. As such the use of a GET action for an update is not preferred, however that is the standard in use by the client. While a POST action would be my personal preference, compatibility and working is more important.
+
 ## Deploying the Provider
 Within the Microsoft Azure Function portal:
 1. Create a new Azure Function
@@ -9,7 +11,7 @@ Within the Microsoft Azure Function portal:
 4. Deploy this codebase into your Azure Function.
 
 ## Configuring the Inadyn Client
-The following file will need to be updated on the network device at the location: `/etc/inadyn.conf`
+The following file will need to be updated on the network device at the location: `/etc/inadyn.conf`. If you are using a device such as a Unifi Dream Machine or Dream Machine Pro, the file will be located at `/run/ddns_eth{?}_inadyn.conf` instead.
 
 ```conf
 custom your-ddns.azurewebsites.net:1 {
@@ -38,8 +40,7 @@ inadyn -1n --force --loglevel=DEBUG --config=/etc/inadyn.conf
 
 The following snippet depicts what you should see on the Inadyn client when communicating with your DDNS service.
 ```
-GET /api/azure-ddns/update?code=<<YOUR_API_KEY>>&hostname=<<YOUR DOMAIN>>&ipaddr=<<YOUR_IP>> HTTP/1.0
+GET /api/azure-ddns/update?code=<<YOUR_API_KEY>>&hostname=<<YOUR_DOMAIN>>&ipaddr=<<YOUR_IP>> HTTP/1.0
 Host: <<AZURE_FUNCTION_URL>>
-Authorization: Basic <<REDACTED>>
 User-Agent: inadyn/2.9.1 https://github.com/troglobit/inadyn/issues
 ```
