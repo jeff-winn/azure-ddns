@@ -11,7 +11,7 @@ Within the Microsoft Azure Function portal:
 4. Deploy this codebase into your Azure Function.
 
 ## Configuring the Inadyn Client
-The following file will need to be updated on the network device at the location: `/etc/inadyn.conf`. If you are using a device such as a Unifi Dream Machine or Dream Machine Pro, the file will be located at `/run/ddns_eth{?}_inadyn.conf` instead.
+The following file will need to be updated on the network device at the location: `/etc/inadyn.conf`. If you are using a device such as a Unifi Dream Machine or Dream Machine Pro, the file will instead be located at: `/run/ddns_eth{?}_inadyn.conf`.
 
 ```conf
 custom your-ddns.azurewebsites.net:1 {
