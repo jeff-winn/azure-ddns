@@ -24,7 +24,7 @@ custom your-ddns.azurewebsites.net:1 {
 ### Configuration Settings
 The following describes the aforementioned configuration section settings:
 
-- _hostname_: This __MUST__ be the DNS entry being updated.
+- _hostname_: This __MUST__ be the FQDN of the DNS entry being updated.
 - _username_: DO NOT CHANGE!
 - _password_: This __MUST__ be an API key defined for the Azure Function. This value can be found in the App Keys section of the Azure Function configuration.
 - _ddns-server_: This is the location the Azure Function has been deployed.
