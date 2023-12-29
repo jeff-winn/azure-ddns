@@ -36,8 +36,14 @@ if (-not $ipAddr) {
     exit
 }
 
+# TODO: This likely needs to support more than a single subdomain. For example: mydomain.com instead of only my.domain.com
 $dnsName = $hostname.Substring(0, $hostname.IndexOf('.'))
 $zoneName = $hostname.Substring($hostname.IndexOf('.') + 1)
+
+Write-Debug "Hostname: $hostname"
+Write-Debug "Record: $dnsName"
+Write-Debug "DNS Zone: $zoneName"
+Write-Debug "New IP Address: $ipAddr"
 
 $rs = Get-AzDnsRecordSet -ResourceGroupName $dnsZoneRGName -ZoneName $zoneName -Name $dnsName -RecordType A
 if (-not $rs) {
@@ -50,7 +56,7 @@ if (-not $rs) {
     exit
 }
 
-Write-Host "Checking the existing records for zone $zoneName..."
+Write-Debug "Checking the existing records for zone $zoneName..."
 
 $found = $false
 $ipAddrsToRemove = @()
@@ -61,7 +67,7 @@ foreach ($record in $rs.Records) {
         $ipAddrsToRemove += $record.Ipv4Address
     } else {
         # The address already exists, do not try to add it later.
-        Write-Host "Address already exists within the recordset..."
+        Write-Debug "Address already exists within the record set..."
         $found = $true
     }
 }
