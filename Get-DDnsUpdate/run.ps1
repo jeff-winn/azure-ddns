@@ -29,6 +29,9 @@ if (-not $hostname) {
     exit
 }
 
+Write-Debug "Hostname: $hostname" -Debug
+Write-Debug "New IP Address: $ipAddr" -Debug
+
 $ipAddr = $Request.Query.IPAddr
 if (-not $ipAddr) {
     Write-Error "The IPAddr was not provided in the request."
@@ -41,7 +44,7 @@ if (-not $ipAddr) {
 }
 
 $count = [regex]::matches($hostname, '[\.]').count
-Write-Debug "Found $count periods (.) within '$hostname' provided." -Debug
+Write-Debug "Found $count periods (.) within hostname '$hostname' provided." -Debug
 
 # Bases whether a TLD is provided using the number of periods included in the value provided.
 if ($count -eq 1) {
@@ -52,10 +55,9 @@ if ($count -eq 1) {
     $zoneName = $hostname.Substring($hostname.IndexOf('.') + 1)
 }
 
-Write-Debug "Hostname: $hostname" -Debug
-Write-Debug "Record: $dnsName" -Debug
+Write-Debug "Name: $dnsName" -Debug
 Write-Debug "DNS Zone: $zoneName" -Debug
-Write-Debug "New IP Address: $ipAddr" -Debug
+Write-Debug "DNS Zone Resource Group: $dnsZoneRGName" -Debug
 
 $rs = Get-AzDnsRecordSet -ResourceGroupName $dnsZoneRGName -ZoneName $zoneName -Name $dnsName -RecordType A
 if (-not $rs) {
@@ -84,11 +86,10 @@ $ipAddrsToRemove = @()
 
 foreach ($record in $rs.Records) {
     if ($record.Ipv4Address -ne $ipAddr) {
-        # The address was not correct, add it into the array of items to remove.
+        Write-Debug "Found IP address $record.Ipv4Address which does not belong in the record set..." -Debug
         $ipAddrsToRemove += $record.Ipv4Address
     } else {
-        # The address already exists, do not try to add it later.
-        Write-Debug "Address already exists within the record set..." -Debug
+        Write-Debug "Expected IP address already exists within the record set..." -Debug
         $found = $true
     }
 }
@@ -106,7 +107,7 @@ if (!$found) {
 }
 
 Set-AzDnsRecordSet -RecordSet $rs
-Write-Information "Successfully updated DNS zone '$zoneName'."
+Write-Information "Successfully updated DNS zone '$zoneName' in resource group '$dnsZoneRGName'."
 
 # The response values returned here are required by the Inadyn client, do not change!
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
