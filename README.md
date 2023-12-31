@@ -1,8 +1,6 @@
 # Azure DDNS
 Provides an Inadyn compatible DDNS provider that is hosted by an Azure Function which uses an underlying Microsoft Azure DNS Zone to maintain the IP address for a single A record.
 
-Keep in mind, this provider is meant to be Inadyn compatible. As such the use of a GET action for an update is not preferred, however that is the standard in use by the client. While a POST action would be my personal preference, compatibility and working is more important.
-
 ## Deploying the Provider
 Within the Microsoft Azure Function portal:
 1. Create a new Azure Function
