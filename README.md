@@ -1,5 +1,5 @@
 # Azure DDNS
-Provides an In-a-Dyn compatible  DynDNS2 API that is hosted by an Azure Function which uses an underlying Microsoft Azure hosted DNS Zone to maintain the IP address for a single A record.
+Provides an In-a-Dyn compatible  DynDNS2 API to be hosted by an Azure Function which uses an underlying Microsoft Azure hosted DNS Zone to maintain the IP address for a single A record.
 
 ## Deploying the Provider
 Within the Microsoft Azure Function portal:
