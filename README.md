@@ -26,9 +26,7 @@ custom your-ddns.azurewebsites.net:1 {
 }
 ```
 
-#### Options
-The following describes the aforementioned provider options:
-
+#### Provider Options
 - _hostname_: This __MUST__ be the FQDN of the DNS entry to update.
 - _username_: This __MUST__ match the username used in the _AppUsername_ application configuration setting.
 - _password_: This __MUST__ match the password used in the _AppPassword_ application configuration setting.
