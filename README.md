@@ -6,7 +6,7 @@ Within the Microsoft Azure Function portal:
 1. Create a new Azure Function
 2. Open the Configuration pane, and add the following application settings:
     - _AppUsername_ - This is the username that will be required to use the public endpoint.
-    - _AppPassword_ - This is the password that will be required to use the public endpoint.
+    - _AppPassword_ - This is the password that will be required to use the public endpoint. NOTE: Because this provider uses Basic authentication, a colon (:) will not be supported as a character in the password.
     - _DnsZoneRGName_ - This will need to contain the Resource Group Name for your DNS Zone.
 3. Open the Identity pane, and enable a System or User Assigned identity. This identity __MUST__ have `DNS Zone Contributor` role for the DNS Zone the provider will be responsible for modifying.
 4. Deploy this codebase into your Azure Function.
