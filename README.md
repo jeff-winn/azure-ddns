@@ -29,10 +29,10 @@ custom your-ddns.azurewebsites.net:1 {
 ### Configuration Settings
 The following describes the aforementioned configuration section settings:
 
-- _hostname_: This __MUST__ be the FQDN of the DNS entry being updated.
-- _username_: This __MUST__ match the username you set in the _AppUsername_ application configuration setting.
-- _password_: This __MUST__ match the password you set in the _AppPassword_ application configuration setting.
-- _ddns-server_: This is the location the Azure Function has been deployed.
+- _hostname_: This __MUST__ be the FQDN of the DNS entry to update.
+- _username_: This __MUST__ match the username used in the _AppUsername_ application configuration setting.
+- _password_: This __MUST__ match the password used in the _AppPassword_ application configuration setting.
+- _ddns-server_: This is the location where the Azure Function has been deployed.
 - _ddns-path_: DO NOT CHANGE!
 
 ## Testing
@@ -41,10 +41,13 @@ To test this, you will need to have command line access to the device running th
 inadyn -1n --force --loglevel=DEBUG --config=/etc/inadyn.conf
 ```
 
-The following snippet depicts what you should see on the Inadyn client when communicating with your DDNS service.
-```
-GET /nic/update?&hostname=<<YOUR_DOMAIN>>&myip=<<YOUR_IP>> HTTP/1.0
-Host: <<AZURE_FUNCTION_URL>>
-Authorization: Basic <<YOUR_CREDENTIALS>>
-User-Agent: inadyn/2.9.1 https://github.com/troglobit/inadyn/issues
+The following log snippet depicts what you should see on the Inadyn client when communicating with your DDNS service:
+```log
+inadyn[527119]: Sending alias table update to DDNS server: GET /nic/update?hostname=REDACTED&myip=REDACTED HTTP/1.0
+inadyn[527119]: Host: REDACTED
+inadyn[527119]: Authorization: Basic REDACTED
+inadyn[527119]: User-Agent: inadyn/2.9.1 https://github.com/troglobit/inadyn/issues
+inadyn[527119]: Successfully sent HTTPS request!
+inadyn[527119]: Successfully received HTTPS response (138/8191 bytes)!
+inadyn[527119]: DDNS server response: HTTP/1.1 200 OK
 ```
