@@ -1,14 +1,14 @@
 {
     "bindings": [
       {
-        "authLevel": "admin",
+        "authLevel": "anonymous",
         "type": "httpTrigger",
         "direction": "in",
         "name": "Request",
         "methods": [
           "get"
         ],
-        "route": "azure-ddns/update"
+        "route": "nic/update"
       },
       {
         "type": "http",

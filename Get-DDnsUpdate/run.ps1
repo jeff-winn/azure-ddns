@@ -7,9 +7,45 @@ if ($env:IsDebugEnabled) {
     Wait-Debugger
 }
 
+$authHeader = $Request.Headers.Authorization
+if(-not $authHeader -or -not $authHeader.startsWith("Basic ")) {
+    Write-Error "The Basic authorization header was not provided in the request."
+
+    Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
+        StatusCode = [HttpStatusCode]::Unauthorized
+    })
+
+    exit
+}
+
+# Decode the username and password from the authorization header.
+$auth = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($authHeader.substring(6))).split(':')
+$username = $auth[0]
+$password = $auth[1]
+
+Write-Debug "Authorization: $username / $password" -Debug
+
+if (-not $env:AppUsername -or -not $env:AppPassword) {
+    Write-Error "No credentials have been set, please ensure the username and password are set within the application settings."
+
+    Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
+        StatusCode = [HttpStatusCode]::Unauthorized
+    })
+
+    exit
+} elseif (-not $username -eq $env:AppUsername -or -not $password -eq $env:AppPassword) {
+    Write-Error "The credentials did not match those configured in the application settings. Please check your configuration and try again."
+
+    Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
+        StatusCode = [HttpStatusCode]::Unauthorized
+    })
+
+    exit
+}
+
 $dnsZoneRGName = $env:DnsZoneRGName
 if (-not $dnsZoneRGName) {
-    Write-Error "The DNS Zone Resource Group name has not been specified. Please ensure the DnsZoneRGName application setting has been configured."
+    Write-Error "The Resource Group name has not been specified. Please ensure the DnsZoneRGName application setting has been configured."
 
     Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
         StatusCode = [HttpStatusCode]::InternalServerError
@@ -20,7 +56,7 @@ if (-not $dnsZoneRGName) {
 
 $hostname = $Request.Query.HostName
 if (-not $hostname) {
-    Write-Error "The host name was not provided in the request."
+    Write-Error "The hostname was not provided in the request."
 
     Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
         StatusCode = [HttpStatusCode]::BadRequest
@@ -30,11 +66,10 @@ if (-not $hostname) {
 }
 
 Write-Debug "Hostname: $hostname" -Debug
-Write-Debug "New IP Address: $ipAddr" -Debug
 
-$ipAddr = $Request.Query.IPAddr
+$ipAddr = $Request.Query.MyIP
 if (-not $ipAddr) {
-    Write-Error "The IPAddr was not provided in the request."
+    Write-Error "The IP address was not provided in the request."
 
     Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
         StatusCode = [HttpStatusCode]::BadRequest
@@ -42,6 +77,8 @@ if (-not $ipAddr) {
 
     exit
 }
+
+Write-Debug "New IP Address: $ipAddr" -Debug
 
 $count = [regex]::matches($hostname, '[\.]').count
 Write-Debug "Found $count periods (.) within hostname '$hostname' provided." -Debug
@@ -57,7 +94,7 @@ if ($count -eq 1) {
 
 Write-Debug "Name: $dnsName" -Debug
 Write-Debug "DNS Zone: $zoneName" -Debug
-Write-Debug "DNS Zone Resource Group: $dnsZoneRGName" -Debug
+Write-Debug "Resource Group: $dnsZoneRGName" -Debug
 
 $rs = Get-AzDnsRecordSet -ResourceGroupName $dnsZoneRGName -ZoneName $zoneName -Name $dnsName -RecordType A
 if (-not $rs) {
@@ -94,7 +131,7 @@ foreach ($record in $rs.Records) {
     }
 }
 
-Write-Information "Preparing to update the DNS zone '$zoneName' in resource group '$dnsZoneRGName'..."
+Write-Information "Preparing to update the DNS zone '$zoneName' in Resource Group '$dnsZoneRGName'..."
 
 foreach ($existingIpAddr in $ipAddrsToRemove) {
     Remove-AzDnsRecordConfig -RecordSet $rs -Ipv4Address $existingIpAddr
@@ -107,7 +144,7 @@ if (!$found) {
 }
 
 Set-AzDnsRecordSet -RecordSet $rs
-Write-Information "Successfully updated DNS zone '$zoneName' in resource group '$dnsZoneRGName'."
+Write-Information "Successfully updated DNS zone '$zoneName' in Resource Group '$dnsZoneRGName'."
 
 # The response values returned here are required by the Inadyn client, do not change!
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
