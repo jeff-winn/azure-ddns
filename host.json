@@ -7,8 +7,7 @@
     },
     "logging": {
         "logLevel": {
-            "default": "Information",
-            "Function.Get-DdnsUpdate": "Information"
+            "default": "Information"
         }
     },
     "managedDependency": {
