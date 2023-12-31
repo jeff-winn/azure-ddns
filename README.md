@@ -48,12 +48,11 @@ inadyn[527119]: Host: your-ddns.azurewebsites.net
 inadyn[527119]: Authorization: Basic REDACTED
 inadyn[527119]: User-Agent: inadyn/2.9.1 https://github.com/troglobit/inadyn/issues
 inadyn[527119]: Successfully sent HTTPS request!
-inadyn[527119]: Successfully received HTTPS response (138/8191 bytes)!
+inadyn[527119]: Successfully received HTTPS response (205/8191 bytes)!
 inadyn[527119]: DDNS server response: HTTP/1.1 200 OK
 Connection: close
 Content-Type: text/plain; charset=utf-8
 Date: Sun, 31 Dec 2023 02:16:13 GMT
-Server: Kestrel
 
 good
 inadyn[527119]: Successful alias table update for your.azuredomain.com => new IP# REDACTED
