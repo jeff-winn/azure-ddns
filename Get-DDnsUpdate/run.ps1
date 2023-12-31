@@ -23,7 +23,7 @@ $auth = [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64Stri
 $username = $auth[0]
 $password = $auth[1]
 
-Write-Debug "Authorization: $username / $password" -Debug
+Write-Debug "Authorization: $username / ********" -Debug
 
 if (-not $env:AppUsername -or -not $env:AppPassword) {
     Write-Error "No credentials have been set, please ensure the username and password are set within the application settings."
